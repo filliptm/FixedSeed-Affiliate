@@ -6,5 +6,4 @@ dist
 *.log
 .vscode
 .idea
-bun.lock
 package-lock.json
