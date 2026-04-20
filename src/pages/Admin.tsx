@@ -8,6 +8,7 @@ import {
 } from "../lib/api";
 import { isAdmin } from "../lib/roles";
 import PortalTopBar from "../components/PortalTopBar";
+import PortalFooter from "../components/PortalFooter";
 import type { ThemeContext } from "../App";
 
 const STATUS_TABS = ["PENDING", "APPROVED", "REJECTED", "SUSPENDED", "ALL"] as const;
@@ -176,6 +177,8 @@ export default function Admin({ themeCtx }: { themeCtx: ThemeContext }) {
           </div>
         )}
       </main>
+
+      <PortalFooter />
     </div>
   );
 }

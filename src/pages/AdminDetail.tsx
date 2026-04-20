@@ -11,6 +11,7 @@ import {
 } from "../lib/api";
 import { isAdmin } from "../lib/roles";
 import PortalTopBar from "../components/PortalTopBar";
+import PortalFooter from "../components/PortalFooter";
 import type { ThemeContext } from "../App";
 
 export default function AdminDetail({ themeCtx }: { themeCtx: ThemeContext }) {
@@ -148,6 +149,7 @@ export default function AdminDetail({ themeCtx }: { themeCtx: ThemeContext }) {
             {error ? <div className="error-banner">{error}</div> : <div className="loading">Loading…</div>}
           </div>
         </main>
+        <PortalFooter />
       </div>
     );
   }
@@ -362,6 +364,8 @@ export default function AdminDetail({ themeCtx }: { themeCtx: ThemeContext }) {
           </div>
         )}
       </main>
+
+      <PortalFooter />
     </div>
   );
 }

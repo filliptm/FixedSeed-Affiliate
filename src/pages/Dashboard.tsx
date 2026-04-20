@@ -11,6 +11,7 @@ import {
 } from "../lib/api";
 import { isAdmin } from "../lib/roles";
 import PortalTopBar from "../components/PortalTopBar";
+import PortalFooter from "../components/PortalFooter";
 import type { ThemeContext } from "../App";
 
 const WEBSITE_URL = "https://fixedseed.com";
@@ -98,6 +99,8 @@ export default function Dashboard({ themeCtx }: { themeCtx: ThemeContext }) {
           <ApprovedView me={me} conversions={conversions} />
         )}
       </main>
+
+      <PortalFooter />
     </div>
   );
 }

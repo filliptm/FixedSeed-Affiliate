@@ -5,6 +5,7 @@ import Landing from "./pages/Landing";
 import Dashboard from "./pages/Dashboard";
 import Admin from "./pages/Admin";
 import AdminDetail from "./pages/AdminDetail";
+import Terms from "./pages/Terms";
 import { Theme, applyTheme, loadSavedTheme } from "./themes";
 
 export interface ThemeContext {
@@ -37,6 +38,7 @@ export default function App() {
       <Route path="/dashboard" element={<Dashboard themeCtx={themeCtx} />} />
       <Route path="/admin" element={<Admin themeCtx={themeCtx} />} />
       <Route path="/admin/:id" element={<AdminDetail themeCtx={themeCtx} />} />
+      <Route path="/terms" element={<Terms themeCtx={themeCtx} />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
