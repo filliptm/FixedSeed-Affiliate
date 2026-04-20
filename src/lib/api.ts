@@ -92,3 +92,90 @@ export async function getConversions(
 ): Promise<ConversionsPage> {
   return authedFetch(token, `/api/affiliates/me/conversions?page=${page}`);
 }
+
+// ───────── Admin (Auth0-role-gated) ─────────
+
+export interface AdminAffiliate {
+  id: string;
+  auth0Sub: string;
+  email: string;
+  name: string | null;
+  code: string | null;
+  status: AffiliateStatus;
+  commissionType: CommissionType;
+  commissionRate: number;
+  applicationNote: string | null;
+  approvedAt: string | null;
+  rejectedAt: string | null;
+  rejectedReason: string | null;
+  suspendedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface AdminAffiliateDetail extends AdminAffiliate {
+  stats: {
+    totalClicks: number;
+    totalConversions: number;
+    totalCommission: number;
+    totalSales: number;
+  };
+}
+
+export interface AdminListResponse {
+  affiliates: AdminAffiliate[];
+  total: number;
+  page: number;
+  totalPages: number;
+}
+
+export async function adminListAffiliates(
+  token: string,
+  params: { status?: string; search?: string; page?: number } = {}
+): Promise<AdminListResponse> {
+  const qs = new URLSearchParams();
+  if (params.status) qs.set("status", params.status);
+  if (params.search) qs.set("search", params.search);
+  if (params.page) qs.set("page", String(params.page));
+  return authedFetch(token, `/api/affiliates/admin?${qs}`);
+}
+
+export async function adminGetAffiliate(
+  token: string,
+  id: string
+): Promise<AdminAffiliateDetail> {
+  return authedFetch(token, `/api/affiliates/admin/${id}`);
+}
+
+export async function adminApprove(
+  token: string,
+  id: string,
+  params: { commissionType: CommissionType; commissionRate: number; code?: string }
+): Promise<AdminAffiliate> {
+  return authedFetch(token, `/api/affiliates/admin/${id}/approve`, {
+    method: "POST",
+    body: JSON.stringify(params),
+  });
+}
+
+export async function adminReject(
+  token: string,
+  id: string,
+  reason: string
+): Promise<AdminAffiliate> {
+  return authedFetch(token, `/api/affiliates/admin/${id}/reject`, {
+    method: "POST",
+    body: JSON.stringify({ reason }),
+  });
+}
+
+export async function adminUpdate(
+  token: string,
+  id: string,
+  params: { commissionType?: CommissionType; commissionRate?: number; suspended?: boolean }
+): Promise<AdminAffiliate> {
+  return authedFetch(token, `/api/affiliates/admin/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify(params),
+  });
+}

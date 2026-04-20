@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   AffiliateMe,
   Conversion,
@@ -9,6 +9,7 @@ import {
   getConversions,
   getMe,
 } from "../lib/api";
+import { isAdmin } from "../lib/roles";
 
 const WEBSITE_URL = "https://fixedseed.com";
 
@@ -72,6 +73,9 @@ export default function Dashboard() {
       <header className="topbar">
         <div className="topbar-title">Fixed Seed Affiliates</div>
         <div className="topbar-right">
+          {isAdmin(user) && (
+            <Link to="/admin" className="btn btn-primary">Admin</Link>
+          )}
           <span>{user?.email}</span>
           <button
             className="btn"
