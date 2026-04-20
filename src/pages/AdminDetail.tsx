@@ -10,21 +10,21 @@ import {
   adminUpdate,
 } from "../lib/api";
 import { isAdmin } from "../lib/roles";
+import PortalTopBar from "../components/PortalTopBar";
+import type { ThemeContext } from "../App";
 
-export default function AdminDetail() {
-  const { isLoading, isAuthenticated, user, getAccessTokenSilently } = useAuth0();
+export default function AdminDetail({ themeCtx }: { themeCtx: ThemeContext }) {
+  const { isLoading, isAuthenticated, user, logout, getAccessTokenSilently } = useAuth0();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [detail, setDetail] = useState<AdminAffiliateDetail | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
-  // Approve / edit form
   const [commissionType, setCommissionType] = useState<CommissionType>("PERCENT");
   const [rateInput, setRateInput] = useState("25");
   const [customCode, setCustomCode] = useState("");
 
-  // Reject form
   const [rejectReason, setRejectReason] = useState("");
   const [showReject, setShowReject] = useState(false);
 
@@ -63,8 +63,6 @@ export default function AdminDetail() {
   function rateToInt(): number {
     const raw = parseFloat(rateInput);
     if (Number.isNaN(raw)) return 0;
-    // PERCENT: user types 25 -> 2500 basis points
-    // FLAT:    user types 5.00 -> 500 cents
     return Math.round(raw * 100);
   }
 
@@ -110,10 +108,7 @@ export default function AdminDetail() {
     setError(null);
     try {
       const token = await getAccessTokenSilently();
-      await adminUpdate(token, id, {
-        commissionType,
-        commissionRate: rateToInt(),
-      });
+      await adminUpdate(token, id, { commissionType, commissionRate: rateToInt() });
       await load();
     } catch (e: any) {
       setError(e.message);
@@ -140,11 +135,18 @@ export default function AdminDetail() {
   if (!detail) {
     return (
       <div className="app-shell">
-        <header className="topbar">
-          <button className="btn" onClick={() => navigate("/admin")}>← Back</button>
-        </header>
+        <PortalTopBar
+          subtitle="Affiliates · Admin"
+          userEmail={user?.email}
+          theme={themeCtx.theme}
+          onThemeChange={themeCtx.setTheme}
+          onSignOut={() => logout({ logoutParams: { returnTo: window.location.origin } })}
+        />
         <main className="container">
-          {error ? <div className="error-banner">{error}</div> : <div className="loading">Loading…</div>}
+          <button className="btn btn-sm" onClick={() => navigate("/admin")}>← Back</button>
+          <div style={{ marginTop: 16 }}>
+            {error ? <div className="error-banner">{error}</div> : <div className="loading">Loading…</div>}
+          </div>
         </main>
       </div>
     );
@@ -157,20 +159,28 @@ export default function AdminDetail() {
 
   return (
     <div className="app-shell">
-      <header className="topbar">
-        <button className="btn" onClick={() => navigate("/admin")}>← Back</button>
-        <div className="topbar-right">
-          <span>{user?.email}</span>
-        </div>
-      </header>
+      <PortalTopBar
+        subtitle="Affiliates · Admin"
+        userEmail={user?.email}
+        theme={themeCtx.theme}
+        onThemeChange={themeCtx.setTheme}
+        onSignOut={() => logout({ logoutParams: { returnTo: window.location.origin } })}
+      />
 
       <main className="container">
+        <button className="btn btn-sm" onClick={() => navigate("/admin")} style={{ marginBottom: 16 }}>
+          ← Back
+        </button>
+
         {error && <div className="error-banner">{error}</div>}
 
-        <div className="card" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+        <div
+          className="card"
+          style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 16 }}
+        >
           <div>
-            <h2 style={{ margin: 0 }}>{detail.name || detail.email}</h2>
-            <div style={{ color: "var(--fg-dim)", marginTop: 4 }}>{detail.email}</div>
+            <h2 style={{ marginBottom: 4 }}>{detail.name || detail.email}</h2>
+            <div style={{ color: "var(--text-muted)", fontSize: 13 }}>{detail.email}</div>
           </div>
           <span className={`status-badge status-${detail.status.toLowerCase()}`}>
             {detail.status}
@@ -179,13 +189,17 @@ export default function AdminDetail() {
 
         <div className="card">
           <h2>Application</h2>
-          <div className="detail-row"><span>Applied</span><span>{new Date(detail.createdAt).toLocaleString()}</span></div>
-          <div className="detail-row"><span>Auth0 sub</span><span style={{ fontFamily: "monospace", fontSize: 12 }}>{detail.auth0Sub}</span></div>
+          <div className="detail-row">
+            <span>Applied</span>
+            <span>{new Date(detail.createdAt).toLocaleString()}</span>
+          </div>
+          <div className="detail-row">
+            <span>Auth0 sub</span>
+            <span style={{ fontFamily: "SF Mono, Menlo, monospace", fontSize: 12 }}>{detail.auth0Sub}</span>
+          </div>
           {detail.applicationNote && (
-            <div style={{ marginTop: 12 }}>
-              <div style={{ color: "var(--fg-dim)", fontSize: 12, marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.05em" }}>
-                Application note
-              </div>
+            <div style={{ marginTop: 16 }}>
+              <div className="field-label">Application note</div>
               <div className="note-body">{detail.applicationNote}</div>
             </div>
           )}
@@ -202,6 +216,7 @@ export default function AdminDetail() {
               <select
                 value={commissionType}
                 onChange={(e) => setCommissionType(e.target.value as CommissionType)}
+                style={{ width: "auto" }}
               >
                 <option value="PERCENT">Percentage of sale</option>
                 <option value="FLAT">Flat amount per sale</option>
@@ -215,7 +230,7 @@ export default function AdminDetail() {
                 min="0"
                 value={rateInput}
                 onChange={(e) => setRateInput(e.target.value)}
-                style={{ width: 120 }}
+                style={{ width: 140 }}
               />
             </div>
             <div className="detail-row">
@@ -225,7 +240,7 @@ export default function AdminDetail() {
                 placeholder="Auto-generated if blank"
                 value={customCode}
                 onChange={(e) => setCustomCode(e.target.value)}
-                style={{ width: 200 }}
+                style={{ width: 220 }}
               />
             </div>
             <div className="actions-row">
@@ -240,7 +255,7 @@ export default function AdminDetail() {
                     placeholder="Reason shown to applicant"
                     value={rejectReason}
                     onChange={(e) => setRejectReason(e.target.value)}
-                    style={{ flex: 1 }}
+                    style={{ flex: 1, minWidth: 200 }}
                   />
                   <button
                     className="btn btn-danger"
@@ -259,9 +274,20 @@ export default function AdminDetail() {
           <>
             <div className="card">
               <h2>Referral info</h2>
-              <div className="detail-row"><span>Code</span><span style={{ fontFamily: "monospace", fontWeight: 700 }}>{detail.code}</span></div>
-              <div className="detail-row"><span>Current commission</span><span>{formattedRate}</span></div>
-              <div className="detail-row"><span>Approved at</span><span>{detail.approvedAt ? new Date(detail.approvedAt).toLocaleString() : "—"}</span></div>
+              <div className="detail-row">
+                <span>Code</span>
+                <span style={{ fontFamily: "SF Mono, Menlo, monospace", fontWeight: 700 }}>
+                  {detail.code}
+                </span>
+              </div>
+              <div className="detail-row">
+                <span>Current commission</span>
+                <span>{formattedRate}</span>
+              </div>
+              <div className="detail-row">
+                <span>Approved at</span>
+                <span>{detail.approvedAt ? new Date(detail.approvedAt).toLocaleString() : "—"}</span>
+              </div>
             </div>
 
             <div className="card">
@@ -285,6 +311,7 @@ export default function AdminDetail() {
                 <select
                   value={commissionType}
                   onChange={(e) => setCommissionType(e.target.value as CommissionType)}
+                  style={{ width: "auto" }}
                 >
                   <option value="PERCENT">Percentage of sale</option>
                   <option value="FLAT">Flat amount per sale</option>
@@ -298,7 +325,7 @@ export default function AdminDetail() {
                   min="0"
                   value={rateInput}
                   onChange={(e) => setRateInput(e.target.value)}
-                  style={{ width: 120 }}
+                  style={{ width: 140 }}
                 />
               </div>
               <div className="actions-row">
@@ -306,7 +333,7 @@ export default function AdminDetail() {
                   {busy ? "Saving…" : "Save rate"}
                 </button>
                 {detail.status === "APPROVED" ? (
-                  <button className="btn" disabled={busy} onClick={() => handleSuspend(true)}>
+                  <button className="btn btn-danger" disabled={busy} onClick={() => handleSuspend(true)}>
                     Suspend
                   </button>
                 ) : (
@@ -322,38 +349,19 @@ export default function AdminDetail() {
         {detail.status === "REJECTED" && (
           <div className="card">
             <h2>Rejection</h2>
-            <div className="detail-row"><span>Rejected at</span><span>{detail.rejectedAt ? new Date(detail.rejectedAt).toLocaleString() : "—"}</span></div>
+            <div className="detail-row">
+              <span>Rejected at</span>
+              <span>{detail.rejectedAt ? new Date(detail.rejectedAt).toLocaleString() : "—"}</span>
+            </div>
             {detail.rejectedReason && (
-              <div style={{ marginTop: 12 }}>
-                <div style={{ color: "var(--fg-dim)", fontSize: 12, marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.05em" }}>
-                  Reason shown to applicant
-                </div>
+              <div style={{ marginTop: 16 }}>
+                <div className="field-label">Reason shown to applicant</div>
                 <div className="note-body">{detail.rejectedReason}</div>
               </div>
             )}
           </div>
         )}
       </main>
-
-      <style>{`
-        .detail-row {
-          display: flex; justify-content: space-between; align-items: center;
-          padding: 10px 0; border-bottom: 1px solid var(--border); gap: 16px;
-        }
-        .detail-row:last-child { border-bottom: none; }
-        .detail-row > span:first-child { color: var(--fg-dim); font-size: 13px; }
-        .detail-row select, .detail-row input {
-          background: var(--bg); color: var(--fg);
-          border: 1px solid var(--border); border-radius: 6px;
-          padding: 6px 10px; font: inherit;
-        }
-        .actions-row { display: flex; gap: 8px; margin-top: 16px; align-items: center; }
-        .note-body {
-          white-space: pre-wrap;
-          background: var(--bg); border: 1px solid var(--border);
-          border-radius: 8px; padding: 10px 12px; font-size: 13px;
-        }
-      `}</style>
     </div>
   );
 }

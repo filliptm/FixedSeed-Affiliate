@@ -3,7 +3,11 @@ import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import { Auth0Provider } from "@auth0/auth0-react";
 import App from "./App";
+import { applyTheme, loadSavedTheme } from "./themes";
 import "./App.css";
+
+// Apply saved theme before React mounts so the first paint uses the right colors.
+applyTheme(loadSavedTheme());
 
 const domain = import.meta.env.VITE_AUTH0_DOMAIN;
 const clientId = import.meta.env.VITE_AUTH0_CLIENT_ID;

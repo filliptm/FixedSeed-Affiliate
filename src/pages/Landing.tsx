@@ -1,7 +1,8 @@
 import { useAuth0 } from "@auth0/auth0-react";
 import { Navigate } from "react-router-dom";
+import type { ThemeContext } from "../App";
 
-export default function Landing() {
+export default function Landing({ themeCtx: _themeCtx }: { themeCtx: ThemeContext }) {
   const { isAuthenticated, loginWithRedirect } = useAuth0();
 
   if (isAuthenticated) {
@@ -18,11 +19,7 @@ export default function Landing() {
         </p>
         <button
           className="btn btn-primary"
-          onClick={() =>
-            loginWithRedirect({
-              appState: { returnTo: "/dashboard" },
-            })
-          }
+          onClick={() => loginWithRedirect({ appState: { returnTo: "/dashboard" } })}
         >
           Sign in to continue
         </button>

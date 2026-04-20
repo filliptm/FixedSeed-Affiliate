@@ -10,10 +10,12 @@ import {
   getMe,
 } from "../lib/api";
 import { isAdmin } from "../lib/roles";
+import PortalTopBar from "../components/PortalTopBar";
+import type { ThemeContext } from "../App";
 
 const WEBSITE_URL = "https://fixedseed.com";
 
-export default function Dashboard() {
+export default function Dashboard({ themeCtx }: { themeCtx: ThemeContext }) {
   const { isAuthenticated, isLoading, user, logout, getAccessTokenSilently } = useAuth0();
   const navigate = useNavigate();
   const [me, setMe] = useState<AffiliateMe | null>(null);
@@ -70,23 +72,19 @@ export default function Dashboard() {
 
   return (
     <div className="app-shell">
-      <header className="topbar">
-        <div className="topbar-title">Fixed Seed Affiliates</div>
-        <div className="topbar-right">
-          {isAdmin(user) && (
-            <Link to="/admin" className="btn btn-primary">Admin</Link>
-          )}
-          <span>{user?.email}</span>
-          <button
-            className="btn"
-            onClick={() =>
-              logout({ logoutParams: { returnTo: window.location.origin } })
-            }
-          >
-            Sign out
-          </button>
-        </div>
-      </header>
+      <PortalTopBar
+        userEmail={user?.email}
+        theme={themeCtx.theme}
+        onThemeChange={themeCtx.setTheme}
+        onSignOut={() => logout({ logoutParams: { returnTo: window.location.origin } })}
+        actions={
+          isAdmin(user) ? (
+            <Link to="/admin" className="btn btn-sm btn-primary">
+              Admin
+            </Link>
+          ) : undefined
+        }
+      />
 
       <main className="container">
         {error && <div className="error-banner">{error}</div>}
@@ -130,8 +128,8 @@ function ApplyView({ onApplied }: { onApplied: () => void }) {
       <h2>Apply to become an affiliate</h2>
       <p className="card-desc">
         Tell us a little about yourself and how you plan to promote Fixed Seed
-        products. Applications are reviewed manually; you'll see your status on this
-        dashboard once you're approved.
+        products. Applications are reviewed manually; you'll see your status on
+        this dashboard once you're approved.
       </p>
 
       {err && <div className="error-banner">{err}</div>}
@@ -231,12 +229,12 @@ function ApprovedView({
         <div className="code-block">
           <span>{referralUrl}</span>
           <button className="copy-btn" onClick={copy}>
-            {copied ? "Copied!" : "Copy"}
+            {copied ? "Copied" : "Copy"}
           </button>
         </div>
         <p className="card-desc" style={{ marginTop: 16, marginBottom: 0 }}>
-          Commission: <strong style={{ color: "var(--fg)" }}>{rateDisplay}</strong>{" "}
-          per sale.
+          Commission: <strong style={{ color: "var(--text-primary)" }}>{rateDisplay}</strong>
+          {" "}per sale.
         </p>
       </div>
 
@@ -256,7 +254,7 @@ function ApprovedView({
       <div className="card">
         <h2>Recent conversions</h2>
         {conversions.length === 0 ? (
-          <div className="empty">No conversions yet. Share your link to get started.</div>
+          <div className="empty">No conversions yet — share your link to get started.</div>
         ) : (
           <table className="table">
             <thead>
