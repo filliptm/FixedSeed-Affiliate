@@ -43,6 +43,7 @@ Before finishing a change:
 - **Preserve the `NotFoundError` behavior for `GET /api/affiliates/me`.** A 404 means an authenticated user has not applied yet and drives the application form; it is not a generic request failure.
 - **Commission units are not interchangeable.** `PERCENT` rates are basis points; `FLAT` rates are cents. Preserve those units in forms, API types, and formatting.
 - **`VITE_*` configuration is build-time.** Changes to Auth0 or API values require a rebuild. Never place confidential server secrets in `VITE_*`; browser-delivered Auth0 client configuration is public by design.
+- **Node is pinned to 22 or newer** in both [`.nvmrc`](./.nvmrc) and [`package.json`](./package.json). Nixpacks reads these files when selecting the Railway build image; do not remove or weaken the pins.
 - **BrowserRouter requires the production SPA fallback in [`serve.ts`](./serve.ts).** Unknown non-asset paths must return `dist/index.html` so `/dashboard` and `/admin/:id` survive refreshes.
 - **Do not change Auth0 `cacheLocation="localstorage"` casually.** It controls session persistence and changes the portal's security/UX tradeoff; document and test any change deliberately.
 - **Port `7392` is reserved for the affiliate portal.** The server's development CORS allowlist depends on it.
