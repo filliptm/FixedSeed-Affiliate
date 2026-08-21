@@ -24,7 +24,8 @@ Part of the Fixed Seed ecosystem — companion to `FixedSeed-Server` (API + DB) 
 
 ```bash
 bun install
-# Copy .env.example to .env and fill in (or rely on Vite defaults)
+cp .env.example .env
+# Fill in the public Auth0 SPA client ID. Point VITE_API_BASE at localhost when testing a local server.
 bun run dev
 ```
 
@@ -37,12 +38,29 @@ Required:
 | Var | Example | Purpose |
 |-----|---------|---------|
 | `VITE_AUTH0_DOMAIN` | `fixedseed.us.auth0.com` | Auth0 tenant |
-| `VITE_AUTH0_CLIENT_ID` | `CBagKZWc9SSC...` | Auth0 SPA client ID |
+| `VITE_AUTH0_CLIENT_ID` | `<public-spa-client-id>` | Auth0 SPA client ID |
 | `VITE_AUTH0_AUDIENCE` | `https://api.fixedseed.com` | API identifier (configure in Auth0) |
-| `VITE_API_BASE` | `https://fixedseed-server-production-79f0.up.railway.app` | FixedSeed-Server base URL |
+| `VITE_API_BASE` | `https://api.fixedseed.com` | Canonical FixedSeed-Server base URL |
 
 Railway also injects `PORT` at runtime for `serve.ts`.
 
+These are browser-public, build-time settings. Changing any `VITE_*` value requires a rebuild, and confidential Auth0/server credentials must never be placed in them.
+
 ## Deploying
 
-Push to `main` — Railway's NIXPACKS builder runs `bun install && bun run build`, then `bun serve.ts`.
+Production is `https://affiliate.fixedseed.com` on Railway service `FixedSeed-Affiliate` (`7f42ceaf-8244-4b45-9c80-427688e11049`) in the official `FixedSeed` workspace/project and `production` environment. Pushes to `main` trigger the NIXPACKS build in [`railway.json`](./railway.json), then `bun serve.ts`.
+
+Repair a missing/stale local Railway link with:
+
+```bash
+railway link --workspace ae2c92f1-66e7-470e-85fd-552a6057ec35 --project 308f63df-2d13-42fd-a6f4-3d60b3fde489 --environment 1466bf65-bbca-4afd-bdbf-ba6d9feb482e --service 7f42ceaf-8244-4b45-9c80-427688e11049 --json
+```
+
+Before pushing, run:
+
+```bash
+bunx tsc --noEmit
+bun run build
+```
+
+After pushing, confirm `railway status --json`, then poll `railway deployment list --limit 3 --json` until the newest deployment reaches `SUCCESS`. Verify the root page and a deep link, Auth0 login/redirect, authenticated API requests, and production CORS before considering the deploy complete.
