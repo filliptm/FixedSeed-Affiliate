@@ -1,4 +1,4 @@
-const API_BASE = import.meta.env.VITE_API_BASE;
+import { API_BASE } from "./config";
 
 export type AffiliateStatus = "PENDING" | "APPROVED" | "REJECTED" | "SUSPENDED";
 export type CommissionType = "PERCENT" | "FLAT";

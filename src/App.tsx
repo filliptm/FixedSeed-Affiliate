@@ -7,6 +7,7 @@ import Admin from "./pages/Admin";
 import AdminDetail from "./pages/AdminDetail";
 import Terms from "./pages/Terms";
 import { Theme, applyTheme, loadSavedTheme } from "./themes";
+import { APP_ENV, IS_NON_PRODUCTION } from "./lib/config";
 
 export interface ThemeContext {
   theme: Theme;
@@ -33,13 +34,20 @@ export default function App() {
   const themeCtx: ThemeContext = { theme, setTheme };
 
   return (
-    <Routes>
-      <Route path="/" element={<Landing themeCtx={themeCtx} />} />
-      <Route path="/dashboard" element={<Dashboard themeCtx={themeCtx} />} />
-      <Route path="/admin" element={<Admin themeCtx={themeCtx} />} />
-      <Route path="/admin/:id" element={<AdminDetail themeCtx={themeCtx} />} />
-      <Route path="/terms" element={<Terms themeCtx={themeCtx} />} />
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+    <>
+      {IS_NON_PRODUCTION && (
+        <div className="environment-banner" role="status">
+          {APP_ENV.toUpperCase()} ENVIRONMENT
+        </div>
+      )}
+      <Routes>
+        <Route path="/" element={<Landing themeCtx={themeCtx} />} />
+        <Route path="/dashboard" element={<Dashboard themeCtx={themeCtx} />} />
+        <Route path="/admin" element={<Admin themeCtx={themeCtx} />} />
+        <Route path="/admin/:id" element={<AdminDetail themeCtx={themeCtx} />} />
+        <Route path="/terms" element={<Terms themeCtx={themeCtx} />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </>
   );
 }

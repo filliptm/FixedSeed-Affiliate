@@ -47,6 +47,7 @@ Before finishing a change:
 - **BrowserRouter requires the production SPA fallback in [`serve.ts`](./serve.ts).** Unknown non-asset paths must return `dist/index.html` so `/dashboard` and `/admin/:id` survive refreshes.
 - **Do not change Auth0 `cacheLocation="localstorage"` casually.** It controls session persistence and changes the portal's security/UX tradeoff; document and test any change deliberately.
 - **Port `7392` is reserved for the affiliate portal.** The server's development CORS allowlist depends on it.
+- **Environment verticals never cross.** Railway maps `dev` → `dev`, `staging` → `staging`, and `main` → `production`. Hosted dev/staging builds require explicit `VITE_APP_ENV`, API, and Auth0 values and deliberately reject production API/audience values.
 
 ## Development and validation
 
@@ -63,6 +64,6 @@ Before finishing any code change, run `bunx tsc --noEmit` and `bun run build`.
 
 ## Deployment safety
 
-Pushing `main` triggers Railway. A successful Git push is not proof that the portal deployed.
+Pushing `dev`, `staging`, or `main` triggers the matching Railway environment. A successful Git push is not proof that the portal deployed.
 
-Before pushing, run the validation commands above. After pushing, use the Railway CLI in this repository to confirm the linked service and poll the newest deployment until it reaches `SUCCESS`. If it reaches `FAILED` or `CRASHED`, inspect bounded build/runtime logs, fix the cause, push again, and re-verify. Do not consider the task complete while production is behind `main`.
+Before pushing, run the validation commands above. After pushing, explicitly target the matching Railway environment and poll the newest deployment until it reaches `SUCCESS`. If it reaches `FAILED` or `CRASHED`, inspect bounded build/runtime logs, fix the cause, push again, and re-verify. Do not consider the task complete while any promoted branch is ahead of its deployed environment.

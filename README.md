@@ -37,6 +37,7 @@ Required:
 
 | Var | Example | Purpose |
 |-----|---------|---------|
+| `VITE_APP_ENV` | `local`, `dev`, `staging`, or `production` | Deployment identity and non-production safeguards |
 | `VITE_AUTH0_DOMAIN` | `fixedseed.us.auth0.com` | Auth0 tenant |
 | `VITE_AUTH0_CLIENT_ID` | `<public-spa-client-id>` | Auth0 SPA client ID |
 | `VITE_AUTH0_AUDIENCE` | `https://api.fixedseed.com` | API identifier (configure in Auth0) |
@@ -48,7 +49,7 @@ These are browser-public, build-time settings. Changing any `VITE_*` value requi
 
 ## Deploying
 
-Production is `https://affiliate.fixedseed.com` on Railway service `FixedSeed-Affiliate` (`7f42ceaf-8244-4b45-9c80-427688e11049`) in the official `FixedSeed` workspace/project and `production` environment. Pushes to `main` trigger the NIXPACKS build in [`railway.json`](./railway.json), then `bun serve.ts`.
+The Railway branch mapping is `dev` → `dev`, `staging` → `staging`, and `main` → `production`. Each build has environment-specific API and Auth0 values. Production is `https://affiliate.fixedseed.com` on Railway service `FixedSeed-Affiliate` (`7f42ceaf-8244-4b45-9c80-427688e11049`) in the official `FixedSeed` workspace/project. All branches use the NIXPACKS build in [`railway.json`](./railway.json), then `bun serve.ts`.
 
 Repair a missing/stale local Railway link with:
 

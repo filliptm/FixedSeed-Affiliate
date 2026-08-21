@@ -45,6 +45,23 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+.environment-banner {
+  position: fixed;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10000;
+  padding: 5px 12px;
+  border: 1px solid var(--warning);
+  background: var(--bg-primary);
+  color: var(--warning);
+  font-family: monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  pointer-events: none;
+}
+
 /* ─── Layout shells ─── */
 
 .center-screen {
