@@ -604,3 +604,10 @@ select {
     gap: 6px;
   }
 }
+
+/* A commission lowered by a partial refund shows what it was. */
+.commission-was {
+  color: var(--text-muted, inherit);
+  font-size: 0.85em;
+  margin-left: 4px;
+}

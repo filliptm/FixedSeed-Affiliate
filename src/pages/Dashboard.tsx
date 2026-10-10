@@ -275,14 +275,20 @@ function ApprovedView({
                   <td>{new Date(c.createdAt).toLocaleDateString()}</td>
                   <td>{c.productSlug}</td>
                   <td>${(c.amountPaid / 100).toFixed(2)}</td>
-                  <td>${(c.commissionAmount / 100).toFixed(2)}</td>
+                  <td>
+                    ${((c.earnedCommission ?? c.commissionAmount) / 100).toFixed(2)}
+                    {(c.earnedCommission ?? c.commissionAmount) !== c.commissionAmount && (
+                      <small className="commission-was"> was ${(c.commissionAmount / 100).toFixed(2)}</small>
+                    )}
+                  </td>
                   <td>
                     <span
                       className={`status-badge ${
-                        c.paidOut ? "status-approved" : "status-pending"
+                        c.reversedAt ? "status-rejected" : c.paidOut ? "status-approved" : "status-pending"
                       }`}
+                      title={c.reversedAt ? "The sale was refunded or charged back, so it earns no commission." : undefined}
                     >
-                      {c.paidOut ? "Paid" : "Pending"}
+                      {c.reversedAt ? "Reversed" : c.paidOut ? "Paid" : "Pending"}
                     </span>
                   </td>
                 </tr>

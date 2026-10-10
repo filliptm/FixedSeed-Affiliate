@@ -29,6 +29,12 @@ export interface Conversion {
   commissionType: CommissionType;
   commissionRate: number;
   paidOut: boolean;
+  /** Set when a full refund or lost chargeback reversed the sale; it earns nothing. */
+  reversedAt: string | null;
+  /** Money returned to the buyer (US cents); a partial refund lowers the commission. */
+  refundedAmount: number;
+  /** What this conversion still pays after refunds (US cents). */
+  earnedCommission: number;
   createdAt: string;
 }
 
